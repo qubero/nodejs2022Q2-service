@@ -1,13 +1,28 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import InMemoryDB from 'src/db';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { TrackService } from 'src/track/track.service';
+import { FavouritesService } from 'src/favourites/favourites.service';
 
 @Injectable()
 export class AlbumService {
-  private db = new InMemoryDB<Album>();
+  private static db = new InMemoryDB<Album>();
+
+  constructor(
+    @Inject(forwardRef(() => TrackService))
+    private trackService: TrackService,
+    @Inject(forwardRef(() => FavouritesService))
+    private favouritesService: FavouritesService,
+  ) {}
 
   create(createAlbumDto: CreateAlbumDto) {
     const albumData = {
@@ -17,15 +32,15 @@ export class AlbumService {
 
     const newAlbum = new Album(albumData);
 
-    return this.db.create(newAlbum);
+    return AlbumService.db.create(newAlbum);
   }
 
   findAll() {
-    return this.db.findAll();
+    return AlbumService.db.findAll();
   }
 
   async findOne(id: string) {
-    const album = await this.db.findOneById(id);
+    const album = await AlbumService.db.findOneById(id);
 
     if (!album) {
       throw new NotFoundException({
@@ -45,11 +60,21 @@ export class AlbumService {
       ...updateAlbumDto,
     });
 
-    return this.db.update(id, updateAlbum);
+    return AlbumService.db.update(id, updateAlbum);
   }
 
   async remove(id: string) {
     await this.findOne(id);
-    return this.db.removeById(id);
+
+    for (const track of await this.trackService.findAll()) {
+      if (track.albumId === id) {
+        this.trackService.update(track.id, { albumId: null });
+        break;
+      }
+    }
+
+    this.favouritesService.removeAlbum(id);
+
+    return AlbumService.db.removeById(id);
   }
 }

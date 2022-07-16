@@ -1,13 +1,25 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { v4 as uuidv4 } from 'uuid';
 import InMemoryDB from 'src/db';
 import { Track } from './entities/track.entity';
+import { FavouritesService } from 'src/favourites/favourites.service';
 
 @Injectable()
 export class TrackService {
-  private db = new InMemoryDB<Track>();
+  private static db = new InMemoryDB<Track>();
+
+  constructor(
+    @Inject(forwardRef(() => FavouritesService))
+    private favouritesService: FavouritesService,
+  ) {}
 
   create(createTrackDto: CreateTrackDto) {
     const trackData = {
@@ -17,15 +29,15 @@ export class TrackService {
 
     const newTrack = new Track(trackData);
 
-    return this.db.create(newTrack);
+    return TrackService.db.create(newTrack);
   }
 
   findAll() {
-    return this.db.findAll();
+    return TrackService.db.findAll();
   }
 
   async findOne(id: string) {
-    const track = await this.db.findOneById(id);
+    const track = await TrackService.db.findOneById(id);
 
     if (!track) {
       throw new NotFoundException({
@@ -45,11 +57,14 @@ export class TrackService {
       ...updateTrackDto,
     });
 
-    return this.db.update(id, updateTrack);
+    return TrackService.db.update(id, updateTrack);
   }
 
   async remove(id: string) {
     await this.findOne(id);
-    return this.db.removeById(id);
+
+    this.favouritesService.removeTrack(id);
+
+    return TrackService.db.removeById(id);
   }
 }

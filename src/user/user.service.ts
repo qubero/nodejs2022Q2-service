@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
-  private db = new InMemoryDB<User>();
+  private static db = new InMemoryDB<User>();
 
   create(createUserDto: CreateUserDto) {
     const userData = {
@@ -25,15 +25,15 @@ export class UserService {
 
     const newUser = new User(userData);
 
-    return this.db.create(newUser);
+    return UserService.db.create(newUser);
   }
 
   findAll() {
-    return this.db.findAll();
+    return UserService.db.findAll();
   }
 
   async findOne(id: string) {
-    const user = await this.db.findOneById(id);
+    const user = await UserService.db.findOneById(id);
 
     if (!user) {
       throw new NotFoundException({
@@ -62,11 +62,11 @@ export class UserService {
       updatedAt: Date.now(),
     });
 
-    return this.db.update(id, updateUser);
+    return UserService.db.update(id, updateUser);
   }
 
   async remove(id: string) {
     await this.findOne(id);
-    return this.db.removeById(id);
+    return UserService.db.removeById(id);
   }
 }

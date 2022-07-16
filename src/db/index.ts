@@ -1,3 +1,6 @@
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
 export default class InMemoryDB<T extends { id?: string }> {
   private entities: T[] = [];
 

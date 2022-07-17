@@ -12,7 +12,7 @@ const PORT = parseInt(process.env.PORT) || 4000;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const docApiPath = resolve(process.cwd(), 'doc', 'api.yaml');
   const docApi = await readFile(docApiPath, 'utf-8');

@@ -29,7 +29,14 @@ export class FavouritesService {
   async addArtist(id: string) {
     try {
       await this.artistService.findOne(id);
-      return FavouritesService.db.artists.push(id);
+
+      const idx = FavouritesService.db.artists.findIndex(
+        (artistId) => artistId === id,
+      );
+
+      if (idx === -1) {
+        FavouritesService.db.artists.push(id);
+      }
     } catch (e) {
       throw new UnprocessableEntityException();
     }
@@ -46,7 +53,14 @@ export class FavouritesService {
   async addAlbum(id: string) {
     try {
       await this.albumService.findOne(id);
-      return FavouritesService.db.albums.push(id);
+
+      const idx = FavouritesService.db.albums.findIndex(
+        (albumId) => albumId === id,
+      );
+
+      if (idx === -1) {
+        FavouritesService.db.albums.push(id);
+      }
     } catch (e) {
       throw new UnprocessableEntityException();
     }
@@ -63,7 +77,14 @@ export class FavouritesService {
   async addTrack(id: string) {
     try {
       await this.trackService.findOne(id);
-      return FavouritesService.db.tracks.push(id);
+
+      const idx = FavouritesService.db.tracks.findIndex(
+        (trackId) => trackId === id,
+      );
+
+      if (idx === -1) {
+        FavouritesService.db.tracks.push(id);
+      }
     } catch (e) {
       throw new UnprocessableEntityException();
     }

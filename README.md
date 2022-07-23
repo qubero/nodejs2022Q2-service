@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone {repository URL} -b dev
 ```
 
 ## Installing NPM modules
@@ -16,6 +16,10 @@ git clone {repository URL}
 ```
 npm install
 ```
+
+## Setuping environment
+
+Create .env file according to .env.example
 
 ## Running application
 

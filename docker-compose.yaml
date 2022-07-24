@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   web:
-    restart: always
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./docker/web/Dockerfile
@@ -17,7 +17,7 @@ services:
       - db
 
   db:
-    restart: always
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./docker/db/Dockerfile

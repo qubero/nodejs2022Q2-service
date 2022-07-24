@@ -18,7 +18,14 @@
     "test:auth": "cross-env TEST_MODE=auth jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "docker:build:web": "docker build --pull --rm -f \"docker/web/Dockerfile\" -t nest-rest_web \".\"",
+    "docker:run:web": "docker run --env-file .env --rm -it -p 4000:4000/tcp nest-rest_web",
+    "docker:scan:web": "docker scan nest-rest_web",
+    "docker:build:db": "docker build --pull --rm -f \"docker/db/Dockerfile\" -t nest-rest_db \".\"",
+    "docker:run:db": "docker run --env-file .env --rm -it -p 5432:5432/tcp nest-rest_db",
+    "docker:scan:db": "docker scan nest-rest_db",
+    "docker:compose": "docker-compose -f \"docker-compose.yaml\" up --build"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
